@@ -6,6 +6,23 @@ const Input = ({ value, onChange }) => {
 }
 
 const Country = ({ country }) => {
+	const [weather, setWeather] = useState([])
+	const [isLoading, setLoading] = useState(true)
+	useEffect(() => {
+		axios
+			.get(
+				`http://api.weatherstack.com/current?access_key=${process.env.REACT_APP_WEATHER_API}&query=${country.capital}`
+			)
+			.then((response) => {
+				setWeather(response.data)
+				setLoading(false)
+			})
+		// eslint-disable-next-line
+	}, [])
+	if (isLoading) {
+		return <h3>Loading...</h3>
+	}
+	console.log(weather)
 	return (
 		<div>
 			<h2>{country.name}</h2>
@@ -18,6 +35,19 @@ const Country = ({ country }) => {
 				))}
 			</ul>
 			<img src={country.flag} alt='flag' height='100px' width='100px' />
+			<h3>Weather in {country.capital}</h3>
+			<p>
+				<strong>temperature</strong>: {weather.current.temperature}{' '}
+				Celsius
+			</p>
+			<img
+				src={weather.current.weather_icons[0]}
+				alt='weather conditions'
+			/>
+			<p>
+				<strong>wind</strong>: {weather.current.wind_speed} kph
+				direction {weather.current.wind_dir}
+			</p>
 		</div>
 	)
 }
