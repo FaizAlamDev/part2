@@ -1,32 +1,40 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const Countries = ({ countries }) => {
+const Input = ({ value, onChange }) => {
+	return <input value={value} onChange={onChange} />
+}
+
+const Country = ({ country }) => {
+	return (
+		<div>
+			<h2>{country.name}</h2>
+			<p>Capital: {country.capital}</p>
+			<p>Population: {country.population}</p>
+			<h3>languages</h3>
+			<ul>
+				{country.languages.map((language) => (
+					<li key={language.name}>{language.name}</li>
+				))}
+			</ul>
+			<img src={country.flag} alt='flag' height='100px' width='100px' />
+		</div>
+	)
+}
+
+const Countries = ({ countries, handleClick }) => {
 	if (countries.length === 0) {
 		return <p>No matches found</p>
 	} else if (countries.length === 1) {
-		return (
-			<div>
-				<h2>{countries[0].name}</h2>
-				<p>Capital: {countries[0].capital}</p>
-				<p>Population: {countries[0].population}</p>
-				<h3>languages</h3>
-				<ul>
-					{countries[0].languages.map((language) => (
-						<li key={language.name}>{language.name}</li>
-					))}
-				</ul>
-				<img
-					src={countries[0].flag}
-					alt='flag'
-					height='100px'
-					width='100px'
-				/>
-			</div>
-		)
+		return <Country country={countries[0]} />
 	} else if (countries.length > 1 && countries.length <= 10) {
 		return countries.map((country) => (
-			<p key={country.name}>{country.name}</p>
+			<p key={country.name}>
+				{country.name}{' '}
+				<button id={country.name} onClick={handleClick}>
+					show
+				</button>
+			</p>
 		))
 	} else {
 		return <p>Too many matches, specify another filter</p>
@@ -50,11 +58,24 @@ const App = () => {
 	const filteredCountries = countries.filter((country) =>
 		country.name.toLowerCase().includes(inputValue.toLowerCase())
 	)
+	const handleClick = (e) => {
+		setInputValue(e.target.id)
+	}
+
+	// this variable has an array of the object of the country whose button was clicked
+	const country = countries.filter((c) => c.name === inputValue)
 
 	return (
 		<div>
-			<input value={inputValue} onChange={handleInput} />
-			<Countries countries={filteredCountries} />
+			<Input value={inputValue} onChange={handleInput} />
+			{country.length !== 0 ? (
+				<Country country={country[0]} />
+			) : (
+				<Countries
+					countries={filteredCountries}
+					handleClick={handleClick}
+				/>
+			)}
 		</div>
 	)
 }
