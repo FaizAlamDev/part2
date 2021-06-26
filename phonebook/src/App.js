@@ -1,40 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-
-const PersonForm = (props) => {
-	return (
-		<form onSubmit={props.handleForm}>
-			<div>
-				name:{' '}
-				<input value={props.newName} onChange={props.handleName} />
-			</div>
-			<div>
-				number:{' '}
-				<input value={props.newNumber} onChange={props.handleNumber} />
-			</div>
-			<div>
-				<button type='submit'>add</button>
-			</div>
-		</form>
-	)
-}
-
-const Filter = (props) => {
-	return (
-		<div>
-			filter shown with{' '}
-			<input value={props.value} onChange={props.onChange} />
-		</div>
-	)
-}
-
-const Persons = (props) => {
-	return (
-		<div key={props.person.name}>
-			{props.person.name} {props.person.number}
-		</div>
-	)
-}
+import PersonForm from './components/PersonForm'
+import Person from './components/Person'
+import Filter from './components/Filter'
+import personService from './services/persons'
 
 const App = () => {
 	const [persons, setPersons] = useState([])
@@ -43,9 +11,7 @@ const App = () => {
 	const [filterName, setFilterName] = useState('')
 
 	useEffect(() => {
-		axios.get('http://localhost:3001/persons').then((response) => {
-			setPersons(response.data)
-		})
+		personService.getAll().then((obj) => setPersons(obj))
 	}, [])
 
 	const handleName = (e) => {
@@ -62,9 +28,9 @@ const App = () => {
 			window.alert(`${newName} is already added to phonebook`)
 		} else {
 			const person = { name: newName, number: newNumber }
-			axios
-				.post('http://localhost:3001/persons', person)
-				.then((response) => setPersons(persons.concat(response.data)))
+			personService
+				.create(person)
+				.then((obj) => setPersons(persons.concat(obj)))
 		}
 		setNewName('')
 		setNewNumber('')
@@ -93,7 +59,7 @@ const App = () => {
 			/>
 			<h2>Numbers</h2>
 			{filterNamesFunction(persons).map((person) => (
-				<Persons key={person.name} person={person} />
+				<Person key={person.name} person={person} />
 			))}
 		</div>
 	)
