@@ -45,6 +45,15 @@ const App = () => {
 			person.name.toLowerCase().includes(filterName.toLowerCase())
 		)
 
+	const deletePerson = (id) => {
+		const person = persons.find((p) => p.id === id)
+		if (window.confirm(`Delete ${person.name} ?`)) {
+			personService.remove(id).then((response) => {
+				setPersons(persons.filter((p) => p.id !== id))
+			})
+		}
+	}
+
 	return (
 		<div>
 			<h2>Phonebook</h2>
@@ -59,7 +68,11 @@ const App = () => {
 			/>
 			<h2>Numbers</h2>
 			{filterNamesFunction(persons).map((person) => (
-				<Person key={person.name} person={person} />
+				<Person
+					key={person.name}
+					person={person}
+					handleClick={() => deletePerson(person.id)}
+				/>
 			))}
 		</div>
 	)
