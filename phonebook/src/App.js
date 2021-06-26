@@ -24,8 +24,33 @@ const App = () => {
 
 	const handleForm = (e) => {
 		e.preventDefault()
-		if (persons.find((person) => person.name === newName)) {
-			window.alert(`${newName} is already added to phonebook`)
+
+		let flag = false,
+			id = 0
+		persons.forEach((person) => {
+			if (person.name === newName) {
+				flag = true
+				id = person.id
+			}
+		})
+
+		if (flag) {
+			if (
+				window.confirm(
+					`${newName} is already added to phonebook, replace the old number with the new one?`
+				)
+			) {
+				const newPerson = { name: newName, number: newNumber }
+				personService
+					.update(id, newPerson)
+					.then((returnedPerson) =>
+						setPersons(
+							persons.map((p) =>
+								p.id !== id ? p : returnedPerson
+							)
+						)
+					)
+			}
 		} else {
 			const person = { name: newName, number: newNumber }
 			personService
