@@ -22,19 +22,23 @@ const Country = ({ country }) => {
 	if (isLoading) {
 		return <h3>Loading...</h3>
 	}
-	console.log(weather)
 	return (
 		<div>
-			<h2>{country.name}</h2>
+			<h2>{country.name.common}</h2>
 			<p>Capital: {country.capital}</p>
-			<p>Population: {country.population}</p>
+			<p>Area: {country.area}</p>
 			<h3>languages</h3>
 			<ul>
-				{country.languages.map((language) => (
-					<li key={language.name}>{language.name}</li>
+				{Object.values(country.languages).map((language) => (
+					<li key={language}>{language}</li>
 				))}
 			</ul>
-			<img src={country.flag} alt='flag' height='100px' width='100px' />
+			<img
+				src={country.flags.png}
+				alt='flag'
+				height='100px'
+				width='100px'
+			/>
 			<h3>Weather in {country.capital}</h3>
 			<p>
 				<strong>temperature</strong>: {weather.current.temperature}{' '}
@@ -59,9 +63,9 @@ const Countries = ({ countries, handleClick }) => {
 		return <Country country={countries[0]} />
 	} else if (countries.length > 1 && countries.length <= 10) {
 		return countries.map((country) => (
-			<p key={country.name}>
-				{country.name}{' '}
-				<button id={country.name} onClick={handleClick}>
+			<p key={country.name.common}>
+				{country.name.common}{' '}
+				<button id={country.name.common} onClick={handleClick}>
 					show
 				</button>
 			</p>
@@ -76,7 +80,7 @@ const App = () => {
 	const [inputValue, setInputValue] = useState('')
 
 	useEffect(() => {
-		axios.get('https://restcountries.eu/rest/v2/all').then((response) => {
+		axios.get('https://restcountries.com/v3.1/all').then((response) => {
 			setCountries(response.data)
 		})
 	}, [])
@@ -86,14 +90,15 @@ const App = () => {
 	}
 
 	const filteredCountries = countries.filter((country) =>
-		country.name.toLowerCase().includes(inputValue.toLowerCase())
+		country.name.common.toLowerCase().includes(inputValue.toLowerCase())
 	)
+
 	const handleClick = (e) => {
 		setInputValue(e.target.id)
 	}
 
 	// this variable has an array of the object of the country whose button was clicked
-	const country = countries.filter((c) => c.name === inputValue)
+	const country = countries.filter((c) => c.name.common === inputValue)
 
 	return (
 		<div>
